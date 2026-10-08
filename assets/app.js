@@ -1,4 +1,4 @@
-/* Renderiza o painel a partir de window.PAINEL (data/kpis.js). */
+/* Renderiza o painel a partir de window.PAINEL (data/kpis.js). Só gráficos e números. */
 (function () {
   'use strict';
 
@@ -13,67 +13,48 @@
   };
   var eixoOf = function (id) { return P.eixos.filter(function (e) { return e.id === id; })[0]; };
   var comValor = function (k) { return k.serie.filter(function (p) { return p.valor != null; }); };
+  var temSerie = function (k, campo) { return k.serie.some(function (p) { return p[campo] != null; }); };
 
   function fmt(v, dec) {
     if (v == null || isNaN(v)) return '—';
     return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 });
   }
-  // "R$ 29.319" (prefixo) ou "6,3 pts" (sufixo)
-  function valor(k, v, cls) {
-    if (v == null) return '<span class="' + cls + '">—</span>';
+  function numero(k, v) {
+    if (v == null) return '<span class="card__num">—</span>';
     return k.prefixo
-      ? '<span class="' + cls + '"><small>' + esc(k.unidadeCurta) + '</small> ' + fmt(v, k.dec) + '</span>'
-      : '<span class="' + cls + '">' + fmt(v, k.dec) + '<small>' + esc(k.unidadeCurta) + '</small></span>';
+      ? '<span class="card__num"><small>' + esc(k.unidadeCurta) + '</small> ' + fmt(v, k.dec) + '</span>'
+      : '<span class="card__num">' + fmt(v, k.dec) + '<small>' + esc(k.unidadeCurta) + '</small></span>';
   }
-  function ultimos(k) {
+  function ultimo(k) {
     var s = comValor(k);
-    return { atual: s[s.length - 1], anterior: s[s.length - 2] };
+    return s[s.length - 1];
   }
-  function delta(k) {
-    var u = ultimos(k);
-    if (!u.atual) return { txt: 'Sem série verificada', cls: 'flat' };
-    if (!u.anterior) return { txt: 'Único ano disponível', cls: 'flat' };
-    var d = u.atual.valor - u.anterior.valor;
-    var pct = u.anterior.valor ? (d / Math.abs(u.anterior.valor)) * 100 : 0;
-    var bom = k.melhorSe === 'menor' ? d < 0 : d > 0;
-    var cls = d === 0 ? 'flat' : bom ? 'up' : 'down';
-    var seta = d > 0 ? '▲' : d < 0 ? '▼' : '•';
-    return { txt: seta + ' ' + (pct >= 0 ? '+' : '') + fmt(pct, 1) + '% vs ' + u.anterior.ano, cls: cls };
+
+  /* ---------- Ícones da navegação (SVG simples) ---------- */
+  var ICONES = {
+    todos: '<path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z" fill="currentColor"/>',
+    educacao: '<path d="M12 4L2 9l10 5 10-5-10-5z" fill="currentColor"/><path d="M6 11v4c0 1.5 2.7 3 6 3s6-1.5 6-3v-4l-6 3-6-3z" fill="currentColor"/>',
+    saude: '<path d="M12 21s-7-4.4-9.3-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.3 12C19 16.6 12 21 12 21z" fill="currentColor"/>',
+    economia: '<path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7h6v6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>'
+  };
+  function icone(id) {
+    return '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + (ICONES[id] || ICONES.todos) + '</svg>';
   }
-  function temSerie(k, campo) { return k.serie.some(function (p) { return p[campo] != null; }); }
 
-  /* ---------- Cabeçalho ---------- */
-  if ($('atualizado')) $('atualizado').textContent = 'atualizado em ' + P.atualizado;
+  /* ---------- Navegação lateral ---------- */
+  var areas = [{ id: 'todos', nome: 'Dashboard', icone: 'todos' }].concat(P.eixos.map(function (e) {
+    return { id: e.id, nome: e.nome, icone: e.id };
+  }));
+  var atual = 'todos';
 
-  /* ---------- Filtros ---------- */
-  var filtros = [{ id: 'todos', nome: 'Todos' }].concat(P.eixos.map(function (e) { return { id: e.id, nome: e.nome }; }));
-  $('filtros').innerHTML = filtros.map(function (f, i) {
-    return '<button type="button" class="filtro" data-eixo="' + f.id + '" aria-pressed="' + (i === 0) + '">' + esc(f.nome) + '</button>';
-  }).join('');
-  $('filtros').addEventListener('click', function (ev) {
-    var b = ev.target.closest('.filtro');
-    if (!b) return;
-    var alvo = b.getAttribute('data-eixo');
-    Array.prototype.forEach.call($('filtros').querySelectorAll('.filtro'), function (x) {
-      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
-    });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-filtro]'), function (el) {
-      var mostra = alvo === 'todos' || el.getAttribute('data-filtro') === alvo;
-      el.hidden = !mostra;
-    });
-  });
+  function renderNav() {
+    $('nav').innerHTML = areas.map(function (a) {
+      return '<button type="button" class="nav__item" data-area="' + a.id + '" aria-current="' + (a.id === atual) + '">' +
+        icone(a.icone) + '<span>' + esc(a.nome) + '</span></button>';
+    }).join('');
+  }
 
-  /* ---------- Números-chave ---------- */
-  $('tiles').innerHTML = P.kpis.map(function (k) {
-    var e = eixoOf(k.eixo), u = ultimos(k);
-    return '<a class="tile" href="#' + esc(k.id) + '" data-filtro="' + esc(k.eixo) + '" style="--c:' + e.cor + ';text-decoration:none;color:inherit">' +
-      '<div class="tile__rot">' + esc(k.titulo) + '</div>' +
-      '<div class="tile__val">' + (u.atual ? valor(k, u.atual.valor, '').replace(/^<span class="">|<\/span>$/g, '') : '—') + '</div>' +
-      '<div class="tile__ano">' + (u.atual ? 'Ano ' + u.atual.ano : 'Dado pendente') + '</div>' +
-      '</a>';
-  }).join('');
-
-  /* ---------- Eixos e cards ---------- */
+  /* ---------- Cards ---------- */
   function legendaDe(k) {
     var itens = ['<span><i style="background:' + eixoOf(k.eixo).cor + '"></i>' + esc(P.nomeMunicipio) + '</span>'];
     if (temSerie(k, 'meta')) itens.push('<span><i style="background:#7A8493"></i>Meta</span>');
@@ -83,58 +64,64 @@
   }
 
   function card(k) {
-    var e = eixoOf(k.eixo), u = ultimos(k), d = delta(k);
-    var n = comValor(k).length;
-    var grafico = n === 0
-      ? '<div class="chart chart--vazio">Sem série verificada nesta versão</div>'
+    var e = eixoOf(k.eixo), u = ultimo(k);
+    var grafico = comValor(k).length === 0
+      ? '<div class="chart chart--vazio">Sem série verificada</div>'
       : '<div class="chart"><canvas id="chart-' + esc(k.id) + '" role="img" aria-label="' + esc(k.titulo) + '"></canvas></div>';
-    return '<article class="card" id="' + esc(k.id) + '" style="--c:' + e.cor + '">' +
-      '<div class="card__top">' +
-        '<div><h3 class="card__titulo">' + esc(k.titulo) + '</h3><p class="card__desc">' + esc(k.descricao) + '</p></div>' +
-        '<div class="card__num">' + valor(k, u.atual && u.atual.valor, 'card__val') +
-          '<div class="card__delta ' + d.cls + '">' + esc(d.txt) + '</div></div>' +
+    return '<article class="card" data-eixo="' + esc(k.eixo) + '" data-busca="' + esc((k.titulo + ' ' + k.descricao + ' ' + e.nome).toLowerCase()) + '">' +
+      '<div class="card__head">' +
+        '<div><h2 class="card__titulo">' + esc(k.titulo) + '</h2><p class="card__eixo">' + esc(e.nome) + '</p></div>' +
+        '<div class="card__valor">' + numero(k, u && u.valor) + (u ? '<div class="card__ano">' + u.ano + '</div>' : '') + '</div>' +
       '</div>' +
       grafico + legendaDe(k) +
-      '<div class="card__pe"><span class="card__fonte">Fonte: ' + esc(k.fonteCurta) + '</span>' +
-        '<span>Decisão: <span class="decisao decisao--' + esc(k.decisao.acao) + '">' + esc(k.decisao.acao) + '</span></span></div>' +
-      '<details class="metodo"><summary>Método e limitações</summary>' +
-        '<dl class="metodo__grid">' +
-          '<div class="full"><dt>Pergunta que responde</dt><dd>' + esc(k.pergunta) + '</dd></div>' +
-          '<div class="full"><dt>Fórmula</dt><dd><code>' + esc(k.formula) + '</code></dd></div>' +
-          '<div><dt>Comparado com</dt><dd>' + esc(k.comparacao) + '</dd></div>' +
-          '<div><dt>Fonte</dt><dd>' + (k.url ? '<a href="' + esc(k.url) + '" target="_blank" rel="noopener">' + esc(k.fonte) + '</a>' : esc(k.fonte)) + '</dd></div>' +
-          '<div><dt>Permite concluir</dt><dd>' + esc(k.permite) + '</dd></div>' +
-          '<div><dt>Não permite concluir</dt><dd>' + esc(k.naoPermite) + '</dd></div>' +
-          '<div class="full"><dt>Decisão possível</dt><dd>' + esc(k.decisao.texto) + '</dd></div>' +
-          '<div class="full"><dt>Limitação</dt><dd>' + esc(k.limitacao) + '</dd></div>' +
-        '</dl></details>' +
-      '</article>';
+    '</article>';
   }
 
-  $('eixos').innerHTML = P.eixos.map(function (e) {
-    var cards = P.kpis.filter(function (k) { return k.eixo === e.id; }).map(card).join('');
-    return '<section class="eixo" data-filtro="' + e.id + '" style="--c:' + e.cor + '">' +
-      '<h2 class="eixo__titulo">' + esc(e.nome) + '</h2>' +
-      '<div class="grid-cards">' + cards + '</div></section>';
-  }).join('');
+  function renderCards() {
+    $('grid').innerHTML = P.kpis.map(card).join('');
+  }
+
+  /* ---------- Filtros: área (menu) e busca ---------- */
+  function aplicarFiltros() {
+    var termo = ($('busca').value || '').trim().toLowerCase();
+    var visiveis = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('.card'), function (c) {
+      var okArea = atual === 'todos' || c.getAttribute('data-eixo') === atual;
+      var okBusca = !termo || c.getAttribute('data-busca').indexOf(termo) !== -1;
+      c.hidden = !(okArea && okBusca);
+      if (!c.hidden) visiveis++;
+    });
+    $('vazio').hidden = visiveis > 0;
+    $('titulo').textContent = (areas.filter(function (a) { return a.id === atual; })[0] || areas[0]).nome;
+  }
 
   /* ---------- Gráficos ---------- */
-  if (typeof Chart !== 'undefined') {
+  function barOpcoes(k) {
+    return {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (c) { return ' ' + fmt(c.parsed.y, k.dec) + ' ' + (k.prefixo ? '' : k.unidadeCurta); } } } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, grid: { color: '#EEF1F6' }, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
+      }
+    };
+  }
+
+  function desenharGraficos() {
+    if (typeof Chart === 'undefined') return;
     Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
-    Chart.defaults.color = '#4A5563';
+    Chart.defaults.color = '#5B6170';
 
     P.kpis.forEach(function (k) {
       var canvas = document.getElementById('chart-' + k.id);
       if (!canvas) return;
       var cor = eixoOf(k.eixo).cor;
       var pts = comValor(k);
-      var labels = k.serie.map(function (p) { return p.ano; });
 
-      // Um único ano: barra. Série: linha com referências.
       if (pts.length === 1) {
         new Chart(canvas, {
           type: 'bar',
-          data: { labels: [pts[0].ano], datasets: [{ data: [pts[0].valor], backgroundColor: cor, borderRadius: 3, barThickness: 70 }] },
+          data: { labels: [pts[0].ano], datasets: [{ data: [pts[0].valor], backgroundColor: cor, borderRadius: 6, barThickness: 80 }] },
           options: barOpcoes(k)
         });
         return;
@@ -144,15 +131,15 @@
         label: P.nomeMunicipio,
         data: k.serie.map(function (p) { return p.valor; }),
         borderColor: cor, backgroundColor: cor,
-        borderWidth: 3, pointRadius: 3, pointHoverRadius: 6, tension: .25, spanGaps: true
+        borderWidth: 3, pointRadius: 3, pointHoverRadius: 6, tension: .3, spanGaps: true
       }];
-      if (temSerie(k, 'meta')) datasets.push({ label: 'Meta', data: k.serie.map(function (p) { return p.meta; }), borderColor: '#7A8493', borderDash: [6, 5], borderWidth: 2, pointRadius: 0, tension: .25, spanGaps: true });
-      if (temSerie(k, 'al')) datasets.push({ label: 'Alagoas', data: k.serie.map(function (p) { return p.al; }), borderColor: '#0E8A8A', borderWidth: 2, pointRadius: 0, tension: .25, spanGaps: true });
-      if (temSerie(k, 'br')) datasets.push({ label: 'Brasil', data: k.serie.map(function (p) { return p.br; }), borderColor: '#B8C0CC', borderDash: [2, 4], borderWidth: 2, pointRadius: 0, tension: .25, spanGaps: true });
+      if (temSerie(k, 'meta')) datasets.push({ label: 'Meta', data: k.serie.map(function (p) { return p.meta; }), borderColor: '#7A8493', borderDash: [6, 5], borderWidth: 2, pointRadius: 0, tension: .3, spanGaps: true });
+      if (temSerie(k, 'al')) datasets.push({ label: 'Alagoas', data: k.serie.map(function (p) { return p.al; }), borderColor: '#0E8A8A', borderWidth: 2, pointRadius: 0, tension: .3, spanGaps: true });
+      if (temSerie(k, 'br')) datasets.push({ label: 'Brasil', data: k.serie.map(function (p) { return p.br; }), borderColor: '#B8C0CC', borderDash: [2, 4], borderWidth: 2, pointRadius: 0, tension: .3, spanGaps: true });
 
       new Chart(canvas, {
         type: 'line',
-        data: { labels: labels, datasets: datasets },
+        data: { labels: k.serie.map(function (p) { return p.ano; }), datasets: datasets },
         options: {
           responsive: true, maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
@@ -162,31 +149,31 @@
           },
           scales: {
             x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 8 } },
-            y: { grid: { color: '#EEF2F6' }, beginAtZero: !!k.inicioZero, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
+            y: { grid: { color: '#EEF1F6' }, beginAtZero: !!k.inicioZero, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
           }
         }
       });
     });
   }
 
-  function barOpcoes(k) {
-    return {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (c) { return ' ' + fmt(c.parsed.y, k.dec) + ' ' + (k.prefixo ? '' : k.unidadeCurta); } } } },
-      scales: {
-        x: { grid: { display: false } },
-        y: { beginAtZero: true, grid: { color: '#EEF2F6' }, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
-      }
-    };
-  }
+  /* ---------- Eventos ---------- */
+  $('atualizado').textContent = P.atualizado;
+  renderNav();
+  renderCards();
+  desenharGraficos();
+  aplicarFiltros();
 
-  /* ---------- Leitura integrada ---------- */
-  function listar(id, arr) {
-    var el = $(id);
-    if (el) el.innerHTML = (arr || []).map(function (t) { return '<li>' + t + '</li>'; }).join('');
-  }
-  listar('permite', P.permite);
-  listar('naoPermite', P.naoPermite);
-  listar('recomendacoes', P.recomendacoes);
-  listar('fontes', P.fontes);
+  $('nav').addEventListener('click', function (ev) {
+    var b = ev.target.closest('.nav__item');
+    if (!b) return;
+    atual = b.getAttribute('data-area');
+    renderNav();
+    aplicarFiltros();
+    $('side').classList.remove('aberto');
+  });
+  $('busca').addEventListener('input', aplicarFiltros);
+  $('menu').addEventListener('click', function () {
+    var aberto = $('side').classList.toggle('aberto');
+    $('menu').setAttribute('aria-expanded', aberto ? 'true' : 'false');
+  });
 })();

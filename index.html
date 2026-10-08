@@ -4,68 +4,50 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Arapiraca em Indicadores</title>
-  <meta name="description" content="6 KPIs públicos de Arapiraca-AL: educação, saúde e desenvolvimento econômico. Projeto Integrador, UNEAL.">
-  <meta name="theme-color" content="#D81818">
+  <meta name="description" content="Gráficos de 6 indicadores públicos de Arapiraca-AL: educação, saúde e desenvolvimento econômico. Projeto Integrador, UNEAL.">
+  <meta name="theme-color" content="#1E1D2B">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css?v=5">
+  <link rel="stylesheet" href="assets/styles.css?v=6">
 </head>
 <body>
 
-<div class="faixa" aria-hidden="true"></div>
+<div class="app">
 
-<header class="cabecalho">
-  <div class="wrap cabecalho__in">
-    <img class="cabecalho__logo" src="assets/logo-uneal.png" alt="UNEAL">
-    <div class="cabecalho__txt">
-      <p class="kicker">Projeto Integrador · Controladoria</p>
-      <h1>Arapiraca em indicadores</h1>
+  <aside class="side" id="side" aria-label="Navegação">
+    <div class="side__logo">
+      <img src="assets/logo-uneal.png" alt="UNEAL">
     </div>
-    <p class="cabecalho__meta">Dados públicos · <span id="atualizado"></span></p>
+    <nav class="side__nav" id="nav"></nav>
+  </aside>
+
+  <div class="conteudo">
+    <header class="topo">
+      <button type="button" class="topo__menu" id="menu" aria-label="Mostrar menu" aria-controls="side" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <label class="busca">
+        <span class="sr">Pesquisar indicador</span>
+        <input type="search" id="busca" placeholder="Procurar indicador..." autocomplete="off">
+        <span class="busca__btn" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        </span>
+      </label>
+      <p class="topo__info">Arapiraca · <span id="atualizado"></span></p>
+    </header>
+
+    <main class="principal">
+      <h1 class="principal__titulo" id="titulo">Dashboard</h1>
+      <div class="grid" id="grid"></div>
+      <p class="vazio" id="vazio" hidden>Nenhum indicador encontrado.</p>
+    </main>
   </div>
-</header>
 
-<nav class="filtros" aria-label="Filtrar por eixo">
-  <div class="wrap filtros__in" id="filtros"></div>
-</nav>
+</div>
 
-<main class="wrap">
-  <section class="tiles" id="tiles" aria-label="Resumo dos indicadores"></section>
-
-  <div id="eixos"></div>
-
-  <section class="painel" aria-labelledby="leitura-titulo">
-    <h2 id="leitura-titulo" class="painel__titulo">Leitura integrada</h2>
-    <div class="grid-2">
-      <div>
-        <h3 class="sub">O painel permite afirmar</h3>
-        <ul class="lista" id="permite"></ul>
-      </div>
-      <div>
-        <h3 class="sub">O painel não permite afirmar</h3>
-        <ul class="lista lista--x" id="naoPermite"></ul>
-      </div>
-    </div>
-    <h3 class="sub sub--gap">Recomendações para a AB2</h3>
-    <ol class="lista lista--num" id="recomendacoes"></ol>
-  </section>
-
-  <details class="painel fontes">
-    <summary>Fontes</summary>
-    <ul class="lista" id="fontes"></ul>
-  </details>
-</main>
-
-<footer class="rodape">
-  <div class="wrap rodape__in">
-    <img src="assets/logo-uneal.png" alt="" class="rodape__logo">
-    <p>Universidade Estadual de Alagoas · Departamento de Ciências Contábeis · Projeto Integrador, Etapa 2 · 2026.2</p>
-  </div>
-</footer>
-
-<script src="data/kpis.js?v=5"></script>
+<script src="data/kpis.js?v=6"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="assets/app.js?v=5"></script>
+<script src="assets/app.js?v=6"></script>
 </body>
 </html>
