@@ -156,6 +156,8 @@
     });
   }
 
+  window.PAINEL_FILTRAR = aplicarFiltros;
+
   /* ---------- Eventos ---------- */
   $('atualizado').textContent = P.atualizado;
   renderNav();

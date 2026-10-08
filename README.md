@@ -21,3 +21,9 @@ Cada indicador traz a pergunta que responde, a fórmula, a fonte, o comparativo 
 - `assets/logo-uneal.jpg` — logo da UNEAL
 
 Sem build: basta abrir `index.html` ou servir a pasta com qualquer servidor estático.
+
+## Análises comparativas
+Além dos 6 KPIs, o painel traz 10 gráficos que comparam Arapiraca com os **102 municípios de Alagoas**:
+IDEB (aprovação × SAEB, posição no ranking, distribuição, ganhos), PIB per capita, salário formal, vínculos formais por habitante e população.
+
+Dados de `data/analises.js`: IDEB das planilhas do INEP (anos iniciais e finais, todos os municípios de AL); PIB, população, salário médio e pessoal ocupado das séries do IBGE (API de Agregados).
