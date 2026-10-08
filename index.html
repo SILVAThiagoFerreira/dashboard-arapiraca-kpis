@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arapiraca em Indicadores — Educação, Saúde e Desenvolvimento</title>
+  <meta name="description" content="Painel de 6 KPIs públicos de Arapiraca-AL (2 em Educação, 2 em Saúde e 2 em Desenvolvimento Econômico), com fonte, fórmula, comparação e decisão possível. Projeto Integrador — UNEAL.">
+  <meta name="theme-color" content="#C8102E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css?v=3">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <img class="topbar__logo" src="assets/logo-uneal.jpg" alt="Logo da Universidade Estadual de Alagoas (UNEAL)">
+    <div class="topbar__text">
+      <p class="topbar__kicker">Projeto Integrador · Controladoria · UNEAL</p>
+      <h1 class="topbar__title">Arapiraca em indicadores</h1>
+      <p class="topbar__sub">6 KPIs públicos para ler educação, saúde e desenvolvimento econômico do município — com fonte, método e limites.</p>
+    </div>
+    <div class="topbar__meta">
+      <span class="chip" id="dataAtualizacao">Dados públicos</span>
+    </div>
+  </div>
+  <div class="topbar__bar" aria-hidden="true"></div>
+</header>
+
+<main class="wrap">
+
+  <!-- Princípio do método -->
+  <section class="principio" aria-label="Como ler este painel">
+    <div class="principio__box principio__box--num">
+      <span>Número</span><b>≠ diagnóstico</b>
+    </div>
+    <div class="principio__box principio__box--ind">
+      <span>Indicador</span><b>≠ decisão</b>
+    </div>
+    <p class="principio__txt">Cada KPI abaixo traz a <strong>pergunta que responde</strong>, a <strong>fórmula</strong>, a <strong>fonte</strong>, o <strong>comparativo</strong> usado, o que ele <strong>permite</strong> e <strong>não permite</strong> concluir, e a <strong>decisão</strong> que poderia apoiar.</p>
+  </section>
+
+  <!-- Resumo -->
+  <section aria-labelledby="resumo-titulo">
+    <div class="section-head">
+      <h2 id="resumo-titulo" class="section-title">Resumo dos 6 indicadores</h2>
+      <p class="section-sub">Último valor verificado de cada KPI. Clique em um cartão para ir ao detalhe.</p>
+    </div>
+    <div class="grid-6" id="resumo"></div>
+  </section>
+
+  <!-- Eixos -->
+  <div id="eixos"></div>
+
+  <!-- Leitura integrada -->
+  <section class="card card--wide" aria-labelledby="leitura-titulo">
+    <div class="section-head">
+      <h2 id="leitura-titulo" class="section-title">Leitura integrada: o que o painel permite afirmar</h2>
+      <p class="section-sub">Síntese cautelosa. Os seis indicadores não bastam para dizer se o município tem bom ou mau desempenho global.</p>
+    </div>
+    <div class="grid-2 leitura">
+      <div>
+        <h3 class="h3">Permite afirmar</h3>
+        <ul class="list" id="permite"></ul>
+      </div>
+      <div>
+        <h3 class="h3">Não permite afirmar</h3>
+        <ul class="list list--warn" id="nao-permite"></ul>
+      </div>
+    </div>
+    <h3 class="h3 mt">Recomendações para a AB2</h3>
+    <ol class="list list--num" id="recomendacoes"></ol>
+  </section>
+
+  <!-- Fontes -->
+  <section class="card card--wide" aria-labelledby="fontes-titulo">
+    <h2 id="fontes-titulo" class="section-title">Fontes e metodologia</h2>
+    <ul class="fontes" id="fontes"></ul>
+    <p class="nota">Todos os valores são de bases públicas oficiais. Quando uma série não tem o ano mais recente publicado, o painel mostra o último ano disponível e não estima valores. Dados arredondados conforme a fonte.</p>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <img src="assets/logo-uneal.jpg" alt="" class="footer__logo">
+    <div>
+      <p><strong>Universidade Estadual de Alagoas (UNEAL)</strong> · Departamento de Ciências Contábeis</p>
+      <p>Projeto Integrador · Etapa 2 · Tópicos de Controladoria · 2026.2</p>
+      <p class="footer__small">Acadêmicos: Thiago Ferreira da Silva, Arthur Lucas dos Santos Silva, José Mateus Vieira Amorim, Luceildo Samuel Verissimo de Melo.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="data/kpis.js?v=2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="assets/app.js?v=3"></script>
+</body>
+</html>
