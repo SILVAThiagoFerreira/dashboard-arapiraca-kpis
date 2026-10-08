@@ -33,6 +33,7 @@ window.PAINEL = {
         { ano: 2023, valor: 5.5, meta: null, al: 5.91, br: 5.79 },
         { ano: 2025, valor: 6.3, meta: null, al: 6.52, br: 6.18 }
       ],
+      fonteCurta: 'INEP · IDEB',
       pergunta: 'O ensino municipal de 1º ao 5º ano está aprendendo e avançando de série no ritmo esperado?',
       formula: 'IDEB = taxa de aprovação (P) × média padronizada do SAEB (N)',
       fonte: 'INEP — IDEB, planilha de resultados por município (anos iniciais), rede municipal, código 2700300',
@@ -61,6 +62,7 @@ window.PAINEL = {
         { ano: 2023, valor: 4.7, meta: null, al: 4.9, br: 4.59 },
         { ano: 2025, valor: 5.4, meta: null, al: 5.33, br: 4.88 }
       ],
+      fonteCurta: 'INEP · IDEB',
       pergunta: 'Os alunos do 6º ao 9º ano estão aprendendo e concluindo a etapa no tempo previsto?',
       formula: 'IDEB = taxa de aprovação (P) × média padronizada do SAEB (N)',
       fonte: 'INEP — IDEB, planilha de resultados por município (anos finais), rede municipal, código 2700300',
@@ -81,6 +83,7 @@ window.PAINEL = {
       serie: [
         { ano: 2024, valor: 14.7, meta: null, al: null, br: null }
       ],
+      fonteCurta: 'SMS Arapiraca · Boletim 2024',
       pergunta: 'Quantas crianças menores de 1 ano morrem para cada mil nascidas vivas em Arapiraca?',
       formula: 'Óbitos de menores de 1 ano / nascidos vivos no mesmo ano × 1.000',
       fonte: 'Secretaria Municipal de Saúde de Arapiraca — Boletim Epidemiológico (Vigi-Óbito, ref. jan–dez/2024)',
@@ -97,6 +100,7 @@ window.PAINEL = {
       descricao: 'Percentual da população coberta por equipes de Saúde da Família.',
       unidadeCurta: '%', dec: 1, melhorSe: 'maior', inicioZero: true,
       serie: [],
+      fonteCurta: 'e-Gestor AB · pendente',
       pergunta: 'Quanto da população de Arapiraca tem equipe de saúde da família perto de casa?',
       formula: 'População coberta por equipes de Saúde da Família / população estimada × 100',
       fonte: 'e-Gestor Atenção Básica / SISAB (Ministério da Saúde)',
@@ -120,6 +124,7 @@ window.PAINEL = {
         { ano: 2021, valor: 25249.73, meta: null, al: 22662.01, br: 42247.52 },
         { ano: 2023, valor: 29318.52, meta: null, al: null, br: null }
       ],
+      fonteCurta: 'IBGE · Contas Regionais',
       pergunta: 'Quanto cada morador de Arapiraca corresponde em riqueza produzida pelo município?',
       formula: 'PIB a preços correntes do município / população residente estimada',
       fonte: 'IBGE — Contas Regionais (PIB dos Municípios) e Estimativas da População',
@@ -149,6 +154,7 @@ window.PAINEL = {
         { ano: 2020, valor: 1615.08, meta: null, al: 2322.87, br: 3043.81 },
         { ano: 2021, valor: 1767.15, meta: null, al: 2427.38, br: 3266.53 }
       ],
+      fonteCurta: 'IBGE · CEMPRE',
       pergunta: 'Quanto ganha, em média, quem tem emprego formal em Arapiraca, e isso acompanha o estado e o país?',
       formula: 'Salários e outras remunerações / pessoal assalariado médio (valor mensal, em reais)',
       fonte: 'IBGE — Cadastro Central de Empresas (CEMPRE), agregado 1685, variável 10143',

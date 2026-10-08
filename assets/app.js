@@ -3,10 +3,7 @@
   'use strict';
 
   var P = window.PAINEL;
-  if (!P) {
-    document.body.insertAdjacentHTML('beforeend', '<p style="padding:20px">Dados não carregados (data/kpis.js).</p>');
-    return;
-  }
+  if (!P) return;
 
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) {
@@ -15,141 +12,144 @@
     });
   };
   var eixoOf = function (id) { return P.eixos.filter(function (e) { return e.id === id; })[0]; };
+  var comValor = function (k) { return k.serie.filter(function (p) { return p.valor != null; }); };
 
   function fmt(v, dec) {
     if (v == null || isNaN(v)) return '—';
     return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 });
   }
-  // Valor com unidade: "R$ 29.319" (prefixo) ou "6,3 pts" (sufixo). Sem valor, mostra travessão.
-  function valorCurto(k, v) {
-    if (v == null) return '—';
-    return k.prefixo ? '<small>' + esc(k.unidadeCurta) + '</small> ' + fmt(v, k.dec)
-                     : fmt(v, k.dec) + '<small>' + esc(k.unidadeCurta) + '</small>';
+  // "R$ 29.319" (prefixo) ou "6,3 pts" (sufixo)
+  function valor(k, v, cls) {
+    if (v == null) return '<span class="' + cls + '">—</span>';
+    return k.prefixo
+      ? '<span class="' + cls + '"><small>' + esc(k.unidadeCurta) + '</small> ' + fmt(v, k.dec) + '</span>'
+      : '<span class="' + cls + '">' + fmt(v, k.dec) + '<small>' + esc(k.unidadeCurta) + '</small></span>';
   }
-  function ultimo(k) {
-    var s = k.serie.filter(function (p) { return p.valor != null; });
+  function ultimos(k) {
+    var s = comValor(k);
     return { atual: s[s.length - 1], anterior: s[s.length - 2] };
   }
   function delta(k) {
-    var u = ultimo(k);
-    if (!u.atual || !u.anterior) return { txt: 'sem comparação anterior', cls: 'flat' };
+    var u = ultimos(k);
+    if (!u.atual) return { txt: 'Sem série verificada', cls: 'flat' };
+    if (!u.anterior) return { txt: 'Único ano disponível', cls: 'flat' };
     var d = u.atual.valor - u.anterior.valor;
     var pct = u.anterior.valor ? (d / Math.abs(u.anterior.valor)) * 100 : 0;
-    var sinal = d > 0 ? '▲' : d < 0 ? '▼' : '●';
-    // Para mortalidade infantil, queda é positiva. Usa k.melhorSe.
     var bom = k.melhorSe === 'menor' ? d < 0 : d > 0;
     var cls = d === 0 ? 'flat' : bom ? 'up' : 'down';
-    return {
-      txt: sinal + ' ' + fmt(Math.abs(d), k.dec) + ' ' + k.unidadeCurta + ' (' + (pct >= 0 ? '+' : '') + fmt(pct, 1) + '%) vs ' + u.anterior.ano,
-      cls: cls
-    };
+    var seta = d > 0 ? '▲' : d < 0 ? '▼' : '•';
+    return { txt: seta + ' ' + (pct >= 0 ? '+' : '') + fmt(pct, 1) + '% vs ' + u.anterior.ano, cls: cls };
   }
+  function temSerie(k, campo) { return k.serie.some(function (p) { return p[campo] != null; }); }
 
   /* ---------- Cabeçalho ---------- */
-  if ($('dataAtualizacao')) $('dataAtualizacao').textContent = 'Atualizado em ' + P.atualizado;
+  if ($('atualizado')) $('atualizado').textContent = 'atualizado em ' + P.atualizado;
 
-  /* ---------- Resumo ---------- */
-  var resumoHTML = P.kpis.map(function (k) {
-    var e = eixoOf(k.eixo), u = ultimo(k);
-    return '<a class="mini" href="#' + esc(k.id) + '" style="--eixo:' + e.cor + '">' +
-      '<div class="mini__eixo" style="color:' + e.cor + '">' + esc(e.nome) + '</div>' +
-      '<div class="mini__nome">' + esc(k.titulo) + '</div>' +
-      '<div class="mini__val">' + valorCurto(k, u.atual && u.atual.valor) + '</div>' +
-      '<div class="mini__ano">' + (u.atual ? 'Ano ' + u.atual.ano : '') + '</div>' +
+  /* ---------- Filtros ---------- */
+  var filtros = [{ id: 'todos', nome: 'Todos' }].concat(P.eixos.map(function (e) { return { id: e.id, nome: e.nome }; }));
+  $('filtros').innerHTML = filtros.map(function (f, i) {
+    return '<button type="button" class="filtro" data-eixo="' + f.id + '" aria-pressed="' + (i === 0) + '">' + esc(f.nome) + '</button>';
+  }).join('');
+  $('filtros').addEventListener('click', function (ev) {
+    var b = ev.target.closest('.filtro');
+    if (!b) return;
+    var alvo = b.getAttribute('data-eixo');
+    Array.prototype.forEach.call($('filtros').querySelectorAll('.filtro'), function (x) {
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-filtro]'), function (el) {
+      var mostra = alvo === 'todos' || el.getAttribute('data-filtro') === alvo;
+      el.hidden = !mostra;
+    });
+  });
+
+  /* ---------- Números-chave ---------- */
+  $('tiles').innerHTML = P.kpis.map(function (k) {
+    var e = eixoOf(k.eixo), u = ultimos(k);
+    return '<a class="tile" href="#' + esc(k.id) + '" data-filtro="' + esc(k.eixo) + '" style="--c:' + e.cor + ';text-decoration:none;color:inherit">' +
+      '<div class="tile__rot">' + esc(k.titulo) + '</div>' +
+      '<div class="tile__val">' + (u.atual ? valor(k, u.atual.valor, '').replace(/^<span class="">|<\/span>$/g, '') : '—') + '</div>' +
+      '<div class="tile__ano">' + (u.atual ? 'Ano ' + u.atual.ano : 'Dado pendente') + '</div>' +
       '</a>';
   }).join('');
-  $('resumo').innerHTML = resumoHTML;
 
   /* ---------- Eixos e cards ---------- */
-  var eixosHTML = P.eixos.map(function (e) {
-    var cards = P.kpis.filter(function (k) { return k.eixo === e.id; }).map(function (k) {
-      return kpiCard(k, e);
-    }).join('');
-    return '<section class="eixo" style="--eixo:' + e.cor + ';--eixo-soft:' + e.soft + '" aria-labelledby="eixo-' + e.id + '">' +
-      '<div class="eixo__head"><span class="eixo__icon">' + esc(e.icone) + '</span>' +
-      '<div><h2 id="eixo-' + e.id + '">' + esc(e.nome) + '</h2><p>' + esc(e.descricao) + '</p></div></div>' +
-      '<div class="grid-kpi">' + cards + '</div>' +
-      '</section>';
-  }).join('');
-  $('eixos').innerHTML = eixosHTML;
+  function legendaDe(k) {
+    var itens = ['<span><i style="background:' + eixoOf(k.eixo).cor + '"></i>' + esc(P.nomeMunicipio) + '</span>'];
+    if (temSerie(k, 'meta')) itens.push('<span><i style="background:#7A8493"></i>Meta</span>');
+    if (temSerie(k, 'al')) itens.push('<span><i style="background:#0E8A8A"></i>Alagoas</span>');
+    if (temSerie(k, 'br')) itens.push('<span><i style="background:#B8C0CC"></i>Brasil</span>');
+    return itens.length > 1 ? '<div class="legenda">' + itens.join('') + '</div>' : '';
+  }
 
-  function kpiCard(k, e) {
-    var u = ultimo(k), d = delta(k);
-    var legenda = [];
-    legenda.push('<span><i style="background:' + e.cor + '"></i>' + esc(P.nomeMunicipio) + '</span>');
-    if (k.serie.some(function (p) { return p.meta != null; })) legenda.push('<span><i style="background:#7A8493;border-top:1px dashed #7A8493;height:0"></i>Meta</span>');
-    if (k.serie.some(function (p) { return p.al != null; })) legenda.push('<span><i style="background:#0E8A8A"></i>Alagoas</span>');
-    if (k.serie.some(function (p) { return p.br != null; })) legenda.push('<span><i style="background:#9AA3B2"></i>Brasil</span>');
-
-    var decisao = k.decisao || {};
-    var tabela = '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
-      '<thead><tr><th style="text-align:left;padding:4px">Ano</th><th style="text-align:right;padding:4px">' + esc(P.nomeMunicipio) + '</th>' +
-      (k.serie.some(function (p) { return p.meta != null; }) ? '<th style="text-align:right;padding:4px">Meta</th>' : '') +
-      (k.serie.some(function (p) { return p.al != null; }) ? '<th style="text-align:right;padding:4px">AL</th>' : '') +
-      (k.serie.some(function (p) { return p.br != null; }) ? '<th style="text-align:right;padding:4px">BR</th>' : '') +
-      '</tr></thead><tbody>' +
-      k.serie.slice().reverse().map(function (p) {
-        return '<tr><td style="padding:4px;border-top:1px solid var(--line)">' + p.ano + '</td>' +
-          '<td style="padding:4px;text-align:right;border-top:1px solid var(--line)">' + fmt(p.valor, k.dec) + '</td>' +
-          (k.serie.some(function (q) { return q.meta != null; }) ? '<td style="padding:4px;text-align:right;border-top:1px solid var(--line)">' + fmt(p.meta, k.dec) + '</td>' : '') +
-          (k.serie.some(function (q) { return q.al != null; }) ? '<td style="padding:4px;text-align:right;border-top:1px solid var(--line)">' + fmt(p.al, k.dec) + '</td>' : '') +
-          (k.serie.some(function (q) { return q.br != null; }) ? '<td style="padding:4px;text-align:right;border-top:1px solid var(--line)">' + fmt(p.br, k.dec) + '</td>' : '') +
-          '</tr>';
-      }).join('') + '</tbody></table>';
-
-    return '<article class="card kpi" id="' + esc(k.id) + '" style="--eixo:' + e.cor + ';--eixo-soft:' + e.soft + '">' +
-      '<div class="kpi__top">' +
-        '<div><span class="kpi__tag">' + esc(k.tag || e.nome) + '</span>' +
-        '<h3 class="kpi__title">' + esc(k.titulo) + '</h3>' +
-        '<p class="kpi__desc">' + esc(k.descricao) + '</p></div>' +
-        '<div class="kpi__num"><div class="kpi__big">' + valorCurto(k, u.atual && u.atual.valor) + '</div>' +
-        '<div class="kpi__delta ' + d.cls + '">' + esc(d.txt) + '</div>' +
-        '<div class="section-sub">Ano ' + (u.atual ? u.atual.ano : '—') + '</div></div>' +
+  function card(k) {
+    var e = eixoOf(k.eixo), u = ultimos(k), d = delta(k);
+    var n = comValor(k).length;
+    var grafico = n === 0
+      ? '<div class="chart chart--vazio">Sem série verificada nesta versão</div>'
+      : '<div class="chart"><canvas id="chart-' + esc(k.id) + '" role="img" aria-label="' + esc(k.titulo) + '"></canvas></div>';
+    return '<article class="card" id="' + esc(k.id) + '" style="--c:' + e.cor + '">' +
+      '<div class="card__top">' +
+        '<div><h3 class="card__titulo">' + esc(k.titulo) + '</h3><p class="card__desc">' + esc(k.descricao) + '</p></div>' +
+        '<div class="card__num">' + valor(k, u.atual && u.atual.valor, 'card__val') +
+          '<div class="card__delta ' + d.cls + '">' + esc(d.txt) + '</div></div>' +
       '</div>' +
-      '<div class="chart"><canvas id="chart-' + esc(k.id) + '" role="img" aria-label="Série histórica: ' + esc(k.titulo) + '"></canvas></div>' +
-      '<div class="legenda">' + legenda.join('') + '</div>' +
-      '<dl class="audit">' +
-        '<div class="full"><dt>Pergunta que responde</dt><dd>' + esc(k.pergunta) + '</dd></div>' +
-        '<div><dt>Fórmula / como é medido</dt><dd><code>' + esc(k.formula) + '</code></dd></div>' +
-        '<div><dt>Fonte</dt><dd>' + (k.url ? '<a class="fonte-link" href="' + esc(k.url) + '" target="_blank" rel="noopener">' + esc(k.fonte) + '</a>' : esc(k.fonte)) + '</dd></div>' +
-        '<div><dt>Comparado com</dt><dd>' + esc(k.comparacao) + '</dd></div>' +
-        '<div><dt>Decisão possível</dt><dd><span class="decisao decisao--' + esc(decisao.acao) + '">' + esc(decisao.acao) + '</span><br>' + esc(decisao.texto) + '</dd></div>' +
-        '<div class="full"><dt>O que permite concluir</dt><dd>' + esc(k.permite) + '</dd></div>' +
-        '<div class="full"><dt>O que NÃO permite concluir</dt><dd>' + esc(k.naoPermite) + '</dd></div>' +
-        '<div class="full"><dt>Limitação</dt><dd>' + esc(k.limitacao) + '</dd></div>' +
-      '</dl>' +
-      '<details class="audit-wrap"><summary>Ver série completa (' + k.serie.length + ' anos)</summary><div style="margin-top:10px;overflow-x:auto">' + tabela + '</div></details>' +
+      grafico + legendaDe(k) +
+      '<div class="card__pe"><span class="card__fonte">Fonte: ' + esc(k.fonteCurta) + '</span>' +
+        '<span>Decisão: <span class="decisao decisao--' + esc(k.decisao.acao) + '">' + esc(k.decisao.acao) + '</span></span></div>' +
+      '<details class="metodo"><summary>Método e limitações</summary>' +
+        '<dl class="metodo__grid">' +
+          '<div class="full"><dt>Pergunta que responde</dt><dd>' + esc(k.pergunta) + '</dd></div>' +
+          '<div class="full"><dt>Fórmula</dt><dd><code>' + esc(k.formula) + '</code></dd></div>' +
+          '<div><dt>Comparado com</dt><dd>' + esc(k.comparacao) + '</dd></div>' +
+          '<div><dt>Fonte</dt><dd>' + (k.url ? '<a href="' + esc(k.url) + '" target="_blank" rel="noopener">' + esc(k.fonte) + '</a>' : esc(k.fonte)) + '</dd></div>' +
+          '<div><dt>Permite concluir</dt><dd>' + esc(k.permite) + '</dd></div>' +
+          '<div><dt>Não permite concluir</dt><dd>' + esc(k.naoPermite) + '</dd></div>' +
+          '<div class="full"><dt>Decisão possível</dt><dd>' + esc(k.decisao.texto) + '</dd></div>' +
+          '<div class="full"><dt>Limitação</dt><dd>' + esc(k.limitacao) + '</dd></div>' +
+        '</dl></details>' +
       '</article>';
   }
 
-  /* ---------- Gráficos ---------- */
-  function corTexto() { return '#4A5563'; }
-  function corGrade() { return '#E3E7ED'; }
+  $('eixos').innerHTML = P.eixos.map(function (e) {
+    var cards = P.kpis.filter(function (k) { return k.eixo === e.id; }).map(card).join('');
+    return '<section class="eixo" data-filtro="' + e.id + '" style="--c:' + e.cor + '">' +
+      '<h2 class="eixo__titulo">' + esc(e.nome) + '</h2>' +
+      '<div class="grid-cards">' + cards + '</div></section>';
+  }).join('');
 
+  /* ---------- Gráficos ---------- */
   if (typeof Chart !== 'undefined') {
     Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
-    Chart.defaults.color = corTexto();
+    Chart.defaults.color = '#4A5563';
 
     P.kpis.forEach(function (k) {
-      var e = eixoOf(k.eixo);
       var canvas = document.getElementById('chart-' + k.id);
       if (!canvas) return;
+      var cor = eixoOf(k.eixo).cor;
+      var pts = comValor(k);
       var labels = k.serie.map(function (p) { return p.ano; });
+
+      // Um único ano: barra. Série: linha com referências.
+      if (pts.length === 1) {
+        new Chart(canvas, {
+          type: 'bar',
+          data: { labels: [pts[0].ano], datasets: [{ data: [pts[0].valor], backgroundColor: cor, borderRadius: 3, barThickness: 70 }] },
+          options: barOpcoes(k)
+        });
+        return;
+      }
+
       var datasets = [{
         label: P.nomeMunicipio,
         data: k.serie.map(function (p) { return p.valor; }),
-        borderColor: e.cor, backgroundColor: e.cor,
+        borderColor: cor, backgroundColor: cor,
         borderWidth: 3, pointRadius: 3, pointHoverRadius: 6, tension: .25, spanGaps: true
       }];
-      if (k.serie.some(function (p) { return p.meta != null; })) {
-        datasets.push({ label: 'Meta', data: k.serie.map(function (p) { return p.meta; }), borderColor: '#7A8493', borderDash: [6, 5], borderWidth: 2, pointRadius: 0, tension: .25, spanGaps: true });
-      }
-      if (k.serie.some(function (p) { return p.al != null; })) {
-        datasets.push({ label: 'Alagoas', data: k.serie.map(function (p) { return p.al; }), borderColor: '#0E8A8A', borderWidth: 2, pointRadius: 0, tension: .25, spanGaps: true });
-      }
-      if (k.serie.some(function (p) { return p.br != null; })) {
-        datasets.push({ label: 'Brasil', data: k.serie.map(function (p) { return p.br; }), borderColor: '#9AA3B2', borderDash: [2, 4], borderWidth: 2, pointRadius: 0, tension: .25, spanGaps: true });
-      }
+      if (temSerie(k, 'meta')) datasets.push({ label: 'Meta', data: k.serie.map(function (p) { return p.meta; }), borderColor: '#7A8493', borderDash: [6, 5], borderWidth: 2, pointRadius: 0, tension: .25, spanGaps: true });
+      if (temSerie(k, 'al')) datasets.push({ label: 'Alagoas', data: k.serie.map(function (p) { return p.al; }), borderColor: '#0E8A8A', borderWidth: 2, pointRadius: 0, tension: .25, spanGaps: true });
+      if (temSerie(k, 'br')) datasets.push({ label: 'Brasil', data: k.serie.map(function (p) { return p.br; }), borderColor: '#B8C0CC', borderDash: [2, 4], borderWidth: 2, pointRadius: 0, tension: .25, spanGaps: true });
+
       new Chart(canvas, {
         type: 'line',
         data: { labels: labels, datasets: datasets },
@@ -158,19 +158,26 @@
           interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function (c) { return ' ' + c.dataset.label + ': ' + fmt(c.parsed.y, k.dec) + ' ' + k.unidadeCurta; }
-              }
-            }
+            tooltip: { callbacks: { label: function (c) { return ' ' + c.dataset.label + ': ' + fmt(c.parsed.y, k.dec) + ' ' + (k.prefixo ? '' : k.unidadeCurta); } } }
           },
           scales: {
             x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 8 } },
-            y: { grid: { color: corGrade() }, beginAtZero: !!k.inicioZero, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
+            y: { grid: { color: '#EEF2F6' }, beginAtZero: !!k.inicioZero, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
           }
         }
       });
     });
+  }
+
+  function barOpcoes(k) {
+    return {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (c) { return ' ' + fmt(c.parsed.y, k.dec) + ' ' + (k.prefixo ? '' : k.unidadeCurta); } } } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, grid: { color: '#EEF2F6' }, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
+      }
+    };
   }
 
   /* ---------- Leitura integrada ---------- */
@@ -179,7 +186,7 @@
     if (el) el.innerHTML = (arr || []).map(function (t) { return '<li>' + t + '</li>'; }).join('');
   }
   listar('permite', P.permite);
-  listar('nao-permite', P.naoPermite);
+  listar('naoPermite', P.naoPermite);
   listar('recomendacoes', P.recomendacoes);
-  if ($('fontes')) $('fontes').innerHTML = (P.fontes || []).map(function (f) { return '<li>' + f + '</li>'; }).join('');
+  listar('fontes', P.fontes);
 })();
