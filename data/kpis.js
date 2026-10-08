@@ -5,11 +5,11 @@ window.PAINEL = {
   nomeMunicipio: 'Arapiraca',
 
   eixos: [
-    { id: 'educacao', nome: 'Educação', cor: '#1F6FB2', soft: '#E8F1FA', icone: 'E',
+    { id: 'educacao', nome: 'Educação', cor: '#0090D8', soft: '#E6F5FC', icone: 'E',
       descricao: 'Qualidade do aprendizado e fluxo escolar na rede municipal (IDEB).' },
-    { id: 'saude', nome: 'Saúde', cor: '#C8102E', soft: '#FBE9EC', icone: 'S',
+    { id: 'saude', nome: 'Saúde', cor: '#D81818', soft: '#FDECEC', icone: 'S',
       descricao: 'Resultado de saúde materno-infantil e acesso à atenção básica.' },
-    { id: 'economia', nome: 'Desenvolvimento Econômico', cor: '#2E7D4F', soft: '#E7F4EC', icone: 'D',
+    { id: 'economia', nome: 'Desenvolvimento Econômico', cor: '#E0700F', soft: '#FEF1E6', icone: 'D',
       descricao: 'Produção de riqueza por habitante e remuneração do trabalho formal.' }
   ],
 
