@@ -9,7 +9,7 @@ Cada indicador traz a pergunta que responde, a fórmula, a fonte, o comparativo 
 |---|---|---|
 | Educação | IDEB anos iniciais (rede municipal) | INEP |
 | Educação | IDEB anos finais (rede municipal) | INEP |
-| Saúde | Mortalidade infantil | Secretaria Municipal de Saúde (boletim 2024) |
+| Saúde | Mortalidade infantil | IBGE Cidades (2023) e boletim municipal (2024) |
 | Saúde | Cobertura da Atenção Básica | e-Gestor AB — **pendente** |
 | Desenvolvimento Econômico | PIB per capita | IBGE |
 | Desenvolvimento Econômico | Salário médio mensal formal | IBGE (CEMPRE) |
@@ -18,7 +18,7 @@ Cada indicador traz a pergunta que responde, a fórmula, a fonte, o comparativo 
 - `index.html` — página
 - `assets/styles.css`, `assets/app.js` — layout e renderização
 - `data/kpis.js` — todos os números, fontes e textos (edite aqui)
-- `assets/logo-uneal.jpg` — logo da UNEAL
+- `assets/logo-uneal.png` — logo da UNEAL (fundo transparente)
 
 Sem build: basta abrir `index.html` ou servir a pasta com qualquer servidor estático.
 

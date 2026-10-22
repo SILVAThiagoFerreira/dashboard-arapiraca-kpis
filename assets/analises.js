@@ -29,7 +29,7 @@
     });
     return o;
   }
-  function legendaAbaixo() { return { legend: { display: true, position: 'bottom', labels: { boxWidth: 14, boxHeight: 3, font: { size: 11 } } } }; }
+  function legendaAbaixo() { return { legend: { display: true, position: 'bottom', labels: { boxWidth: 14, boxHeight: 3, usePointStyle: false, padding: 16, font: { size: 12 } } } }; }
 
   /* ---------- Cálculos ---------- */
   var anosAR = ANOS_AI.filter(function (y) { return ar.ai && ar.ai[y]; });
@@ -75,9 +75,9 @@
   var topVinc = vinc21.slice(0, 12);
   if (!topVinc.some(function (g) { return g.ar; })) topVinc.push(vinc21.filter(function (g) { return g.ar; })[0]);
 
-  // População: índice (2010 = 100), Arapiraca x total de Alagoas
+  // População: índice (2011 = 100; 2010 não tem população nos 102 municípios), Arapiraca x total de Alagoas
   var anosPop = [];
-  for (var y = 2010; y <= 2025; y++) anosPop.push(String(y));
+  for (var y = 2011; y <= 2025; y++) anosPop.push(String(y));
   var totalAL = {};
   anosPop.forEach(function (y) {
     var soma = 0, n = 0;
@@ -85,8 +85,8 @@
     totalAL[y] = n === M.length ? soma : null;
   });
   var anosPopOK = anosPop.filter(function (y) { return ar.pop[y] != null && totalAL[y] != null; });
-  var idxAR = anosPopOK.map(function (y) { return (ar.pop[y] / ar.pop['2010']) * 100; });
-  var idxAL = anosPopOK.map(function (y) { return (totalAL[y] / totalAL['2010']) * 100; });
+  var idxAR = anosPopOK.map(function (y) { return (ar.pop[y] / ar.pop['2011']) * 100; });
+  var idxAL = anosPopOK.map(function (y) { return (totalAL[y] / totalAL['2011']) * 100; });
 
   // Salário de Arapiraca como % da média dos municípios de AL
   var anosSal = ['2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021'];
@@ -172,7 +172,7 @@
             data: topGanhos.map(function (g) { return g.d; }), borderRadius: 4,
             backgroundColor: topGanhos.map(function (g) { return g.ar ? VERMELHO : AZUL; })
           }] },
-          options: opc({ indexAxis: 'y', plugins: { tooltip: { callbacks: { label: function (ctx) { return ' +' + num(ctx.parsed.x, 1) + ' pontos'; } } } }, scales: { x: { grid: { color: GRADE } }, y: { grid: { display: false } } } })
+          options: opc({ indexAxis: 'y', layout: { padding: { left: 12 } }, plugins: { tooltip: { callbacks: { label: function (ctx) { return ' +' + num(ctx.parsed.x, 1) + ' pontos'; } } } }, scales: { x: { grid: { color: GRADE } }, y: { grid: { display: false } } } })
         });
       }
     },
@@ -186,7 +186,7 @@
             data: topPC.map(function (g) { return g.v; }), borderRadius: 4,
             backgroundColor: topPC.map(function (g) { return g.ar ? VERMELHO : AZUL; })
           }] },
-          options: opc({ indexAxis: 'y', plugins: { tooltip: { callbacks: { label: function (ctx) { return ' R$ ' + num(ctx.parsed.x); } } } }, scales: { x: { grid: { color: GRADE }, ticks: { callback: function (v) { return 'R$ ' + num(v / 1000) + ' mil'; } } }, y: { grid: { display: false } } } })
+          options: opc({ indexAxis: 'y', layout: { padding: { left: 12 } }, plugins: { tooltip: { callbacks: { label: function (ctx) { return ' R$ ' + num(ctx.parsed.x); } } } }, scales: { x: { grid: { color: GRADE }, ticks: { callback: function (v) { return 'R$ ' + num(v / 1000) + ' mil'; } } }, y: { grid: { display: false } } } })
         });
       }
     },
@@ -210,7 +210,7 @@
     },
     {
       id: 'A8', eixo: 'economia', titulo: 'População: Arapiraca × Alagoas',
-      sub: 'Índice com 2010 = 100. Arapiraca em vermelho, total de AL em azul',
+      sub: 'Índice com 2011 = 100. Arapiraca em vermelho, total de AL em azul',
       draw: function (c) {
         new Chart(c, {
           type: 'line',
@@ -243,7 +243,7 @@
             data: topVinc.map(function (g) { return g.v; }), borderRadius: 4,
             backgroundColor: topVinc.map(function (g) { return g.ar ? VERMELHO : AZUL; })
           }] },
-          options: opc({ indexAxis: 'y', plugins: { tooltip: { callbacks: { label: function (ctx) { return ' ' + num(ctx.parsed.x, 1) + ' por mil hab.'; } } } }, scales: { x: { grid: { color: GRADE } }, y: { grid: { display: false } } } })
+          options: opc({ indexAxis: 'y', layout: { padding: { left: 12 } }, plugins: { tooltip: { callbacks: { label: function (ctx) { return ' ' + num(ctx.parsed.x, 1) + ' por mil hab.'; } } } }, scales: { x: { grid: { color: GRADE } }, y: { grid: { display: false } } } })
         });
       }
     }

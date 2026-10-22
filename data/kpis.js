@@ -1,7 +1,7 @@
 /* Dados verificados em fontes públicas oficiais. Atualize aqui. Ver "fontes" e "observacao" de cada KPI.
    Campos de série: ano, valor (município), meta (quando a fonte publica), al/br (referência de comparação). */
 window.PAINEL = {
-  atualizado: '08/10/2026',
+  atualizado: '22/10/2026',
   nomeMunicipio: 'Arapiraca',
 
   eixos: [
@@ -36,7 +36,8 @@ window.PAINEL = {
       fonteCurta: 'INEP · IDEB',
       pergunta: 'O ensino municipal de 1º ao 5º ano está aprendendo e avançando de série no ritmo esperado?',
       formula: 'IDEB = taxa de aprovação (P) × média padronizada do SAEB (N)',
-      fonte: 'INEP — IDEB, planilha de resultados por município (anos iniciais), rede municipal, código 2700300',
+      fonte: 'INEP — IDEB 2025 (divulgado em ago/2026), planilha de resultados por município (anos iniciais), rede municipal, código 2700300',
+      observacao: 'Conferido em 22/10/2026. Os valores de 2023 (5,5) e 2025 (6,3) batem com a notícia de 06/08/2026 da Tribuna do Sertão (comunicado da Prefeitura, nota 6,32) e com a planilha do INEP usada em analises.js. A série 2005–2021 confere com a mesma planilha, mas não foi reconferida no site do INEP (download bloqueado nesta verificação). Média de Alagoas (6,52 em 2025; 5,91 em 2023) confere com a média simples dos 102 municípios em analises.js. Brasil (5,79 e 6,18): não verificado. Metas: não verificadas. Documento da Prefeitura (pacto IDEB 2021) traz projeção de 6,2 para 2021, diferente de 5,3 aqui.',
       url: 'https://download.inep.gov.br/ideb/resultados/divulgacao_anos_iniciais_municipios_2025.zip',
       comparacao: 'Meta projetada pelo INEP (2007–2021), média simples dos municípios de Alagoas e do Brasil (rede municipal) no mesmo ano.',
       permite: 'Arapiraca subiu de 3,0 (2005) para 6,3 (2025) e superou a meta publicada até 2021. Em 2025, ficou 0,2 abaixo da média simples de Alagoas (6,52) e 0,1 acima da do Brasil (6,18).',
@@ -65,7 +66,8 @@ window.PAINEL = {
       fonteCurta: 'INEP · IDEB',
       pergunta: 'Os alunos do 6º ao 9º ano estão aprendendo e concluindo a etapa no tempo previsto?',
       formula: 'IDEB = taxa de aprovação (P) × média padronizada do SAEB (N)',
-      fonte: 'INEP — IDEB, planilha de resultados por município (anos finais), rede municipal, código 2700300',
+      fonte: 'INEP — IDEB 2025 (divulgado em ago/2026), planilha de resultados por município (anos finais), rede municipal, código 2700300',
+      observacao: 'Conferido em 22/10/2026. O valor de 2023 (4,7) bate com a planilha do INEP usada em analises.js. Em 2025, a planilha dá 5,4 e a 27ª posição entre os municípios de AL bate com a notícia de 06/08/2026, mas a mesma notícia cita nota 5,52 (4,70 para 5,52). Divergência NÃO resolvida: conferir a nota de 2025 no arquivo do INEP antes de divulgar. Média de AL (5,33 em 2025; 4,90 em 2023) confere com a média simples dos municípios. Brasil: não verificado. Metas: não verificadas; documento da Prefeitura (IDEB 2021) traz projeção de 5,2 para 2021, diferente de 4,3 aqui.',
       url: 'https://download.inep.gov.br/ideb/resultados/divulgacao_anos_finais_municipios_2025.zip',
       comparacao: 'Meta projetada pelo INEP (2007–2021), média simples dos municípios de Alagoas e do Brasil (rede municipal) no mesmo ano.',
       permite: 'Em 2025, o IDEB dos anos finais (5,4) ficou acima da média simples de Alagoas (5,33) e da do Brasil (4,88), e superou a meta até 2021. A trajetória desde 2005 é de melhora clara.',
@@ -81,16 +83,18 @@ window.PAINEL = {
       descricao: 'Óbitos de menores de 1 ano para cada mil nascidos vivos.',
       unidadeCurta: '/mil NV', dec: 1, melhorSe: 'menor', inicioZero: false,
       serie: [
+        { ano: 2023, valor: 14.2, meta: null, al: null, br: null },
         { ano: 2024, valor: 14.7, meta: null, al: null, br: null }
       ],
-      fonteCurta: 'SMS Arapiraca · Boletim 2024',
+      fonteCurta: 'IBGE 2023 · SMS boletim 2024',
       pergunta: 'Quantas crianças menores de 1 ano morrem para cada mil nascidas vivas em Arapiraca?',
       formula: 'Óbitos de menores de 1 ano / nascidos vivos no mesmo ano × 1.000',
-      fonte: 'Secretaria Municipal de Saúde de Arapiraca — Boletim Epidemiológico (Vigi-Óbito, ref. jan–dez/2024)',
+      fonte: 'IBGE Cidades (mortalidade infantil, 2023) e Secretaria Municipal de Saúde de Arapiraca — Boletim Epidemiológico (Vigi-Óbito, ref. jan–dez/2024, não consolidado no SIM)',
+      observacao: 'Conferido em 22/10/2026. O valor de 2023 (14,19) veio de resumo de busca do IBGE Cidades (https://cidades.ibge.gov.br/brasil/al/arapiraca/panorama); a página não pôde ser aberta nesta verificação (HTTP 403), então confirmar lá. O valor de 2024 vem do boletim municipal e não foi comparado com o DATASUS.',
       url: 'https://web.arapiraca.al.gov.br/wp-content/uploads/2025/01/BOLETIMEPIDEMIOLGICOVIGIBITOBITOMATERNOINFANTILEFETALJANDEZDE2024.pdf',
       comparacao: 'Apenas o próprio valor de 2024. Não há série histórica nem média de Alagoas ou do Brasil verificadas nesta versão.',
-      permite: 'Em 2024, a taxa municipal foi de 14,7 óbitos infantis por mil nascidos vivos, segundo o boletim municipal.',
-      naoPermite: 'Não permite dizer se a mortalidade melhorou ou piorou, nem se é alta ou baixa, porque não há série nem referência comparável. Não substitui a série oficial do SIM/SINASC.',
+      permite: 'Em 2023, o IBGE Cidades registra 14,19 óbitos infantis por mil nascidos vivos (14,2 arredondado). O boletim municipal de 2024 registra 14,7, dado ainda não consolidado.',
+      naoPermite: 'Não permite dizer se a mortalidade melhorou ou piorou, nem se é alta ou baixa, porque são apenas dois pontos de fontes diferentes e não há referência comparável. Não substitui a série oficial do SIM/SINASC.',
       decisao: { acao: 'Alterar', texto: 'Antes de usar o indicador para decidir, levantar a série 2010–2024 no TabNet (SIM/SINASC) e comparar com Alagoas e Brasil.' },
       limitacao: 'Dado de boletim municipal, não consolidado pelo SIM/SINASC. O denominador (nascidos vivos) não aparece no texto do boletim. Os boletins de 2025 são parciais.'
     },
@@ -109,6 +113,7 @@ window.PAINEL = {
       permite: 'Ainda não há valor verificado. O indicador foi mantido porque é central para ler acesso à saúde.',
       naoPermite: 'Não permite conclusão nenhuma sobre cobertura até que a série seja extraída do e-Gestor AB.',
       decisao: { acao: 'Alterar', texto: 'Extrair a série de cobertura do e-Gestor AB (Arapiraca, 2019–2024) e preencher este cartão antes da AB2.' },
+      observacao: 'Fonte não verificada. Buscas feitas em 22/10/2026 não localizaram o percentual de cobertura de Arapiraca no e-Gestor AB. Um documento de outro município indica que a série pública do e-Gestor AB pode ter sido encerrada na competência 04/2024; conferir no painel antes de preencher.',
       limitacao: 'O e-Gestor AB não respondeu durante a coleta. Este cartão aparece vazio de propósito, para não preencher com número sem fonte.'
     },
 
@@ -122,18 +127,20 @@ window.PAINEL = {
         { ano: 2019, valor: 21423.02, meta: null, al: 17667.79, br: 35161.7 },
         { ano: 2020, valor: 22430.51, meta: null, al: 18857.69, br: 35935.74 },
         { ano: 2021, valor: 25249.73, meta: null, al: 22662.01, br: 42247.52 },
+        { ano: 2022, valor: 24967.75, meta: null, al: null, br: null },
         { ano: 2023, valor: 29318.52, meta: null, al: null, br: null }
       ],
       fonteCurta: 'IBGE · Contas Regionais',
       pergunta: 'Quanto cada morador de Arapiraca corresponde em riqueza produzida pelo município?',
       formula: 'PIB a preços correntes do município / população residente estimada',
-      fonte: 'IBGE — Contas Regionais (PIB dos Municípios) e Estimativas da População',
+      fonte: 'IBGE — Contas Regionais (PIB dos Municípios, agregado 5938), Estimativas da População (agregado 6579) e Censo 2022 (234.696 habitantes)',
       url: 'https://www.ibge.gov.br/cidades-e-estados/al/arapiraca.html',
-      comparacao: 'Média de Alagoas e do Brasil em 2019–2021. Para 2023, o valor vem do IBGE Cidades e não há referência estadual calculada.',
-      permite: 'De 2019 a 2023, o PIB per capita nominal subiu cerca de 37%. Em 2021, Arapiraca (R$ 25.250) ficou acima da média de Alagoas (R$ 22.662) e abaixo da do Brasil (R$ 42.248).',
+      comparacao: 'Alagoas (2019–2021) = PIB e população somados dos 102 municípios do estado, não o PIB oficial do estado. Brasil (2019–2021) = PIB nacional e população nacional do IBGE. Em 2022 e 2023 não há referência estadual calculada.',
+      permite: 'De 2019 a 2023, o PIB per capita nominal subiu cerca de 37%. Em 2021, Arapiraca (R$ 25.250) ficou acima do agregado dos municípios de Alagoas (R$ 22.662) e abaixo do Brasil (R$ 42.248).',
+      observacao: 'Conferido em 22/10/2026 com a API do IBGE: PIB de Arapiraca 2019–2023 e população 2019–2021 batem com analises.js, e o PIB per capita do Brasil 2019–2021 (35.161,70; 35.935,74; 42.247,52) foi recalculado e bate. O valor de 2023 (R$ 29.318,52, IBGE Cidades) é igual a PIB 2023 / população do Censo 2022. O valor de 2022 (R$ 24.967,75) foi calculado pelo grupo como PIB 2022 / população do Censo 2022. 2024 não verificado.',
       naoPermite: 'Não permite falar em ganho de renda da população: o valor é nominal (sem descontar inflação) e a riqueza do município não se traduz em salário ou distribuição.',
       decisao: { acao: 'Manter', texto: 'Manter o indicador e incluir uma versão deflacionada (IPCA) e a série até 2024, quando publicada.' },
-      limitacao: 'Valores nominais. Os valores de 2019–2021 foram calculados pelo grupo a partir de PIB e população do IBGE. O de 2023 é o valor publicado no IBGE Cidades. 2022 e 2024 não foram verificados.'
+      limitacao: 'Valores nominais. Os valores de 2019–2021 usam população estimada e os de 2022–2023 usam a população do Censo 2022, por isso há quebra de base entre 2021 e 2022. 2024 não foi verificado (PIB não localizado).'
     },
     {
       id: 'D2', eixo: 'economia', tag: 'Desenvolvimento Econômico · Trabalho',
@@ -157,7 +164,8 @@ window.PAINEL = {
       fonteCurta: 'IBGE · CEMPRE',
       pergunta: 'Quanto ganha, em média, quem tem emprego formal em Arapiraca, e isso acompanha o estado e o país?',
       formula: 'Salários e outras remunerações / pessoal assalariado médio (valor mensal, em reais)',
-      fonte: 'IBGE — Cadastro Central de Empresas (CEMPRE), agregado 1685, variável 10143',
+      fonte: 'IBGE — Cadastro Central de Empresas (CEMPRE), agregado 1685, variável 10143, 2010–2021',
+      observacao: 'Conferido em 22/10/2026 com a API do IBGE: Alagoas e Brasil (2010–2021) batem com este arquivo; Arapiraca (2019–2021) também. A série do agregado 1685 encerra em 2021. Não foi localizado valor de RAIS ou CEMPRE posterior para o município nesta verificação.',
       url: 'https://servicodados.ibge.gov.br/api/v3/agregados/1685/periodos/2010-2021/variaveis/10143?localidades=N6[2700300]',
       comparacao: 'Média de Alagoas e do Brasil no mesmo ano (2010–2021).',
       permite: 'O salário médio formal de Arapiraca subiu de R$ 846 (2010) para R$ 1.767 (2021). Em 2021 ele era cerca de 73% do salário médio de Alagoas, contra cerca de 71% em 2010.',
@@ -187,9 +195,11 @@ window.PAINEL = {
   ],
   fontes: [
     'INEP — IDEB, resultados por município (anos iniciais e finais), 2005–2025. <a href="https://ideb.inep.gov.br/" target="_blank" rel="noopener">ideb.inep.gov.br</a>',
-    'IBGE — Contas Regionais (PIB dos Municípios, agregado 5938) e Estimativas da População (agregado 6579), via API de Agregados. <a href="https://www.ibge.gov.br/cidades-e-estados/al/arapiraca.html" target="_blank" rel="noopener">IBGE Cidades: Arapiraca</a>',
+    'IBGE — Contas Regionais (PIB dos Municípios, agregado 5938), Estimativas da População (agregado 6579) e Censo 2022 (234.696 habitantes), via API de Agregados. <a href="https://www.ibge.gov.br/cidades-e-estados/al/arapiraca.html" target="_blank" rel="noopener">IBGE Cidades: Arapiraca</a>',
     'IBGE — CEMPRE, salário médio mensal (agregado 1685, variável 10143), 2010–2021.',
+    'IBGE Cidades — mortalidade infantil de Arapiraca (2023, 14,19 por mil NV, resumo de busca). <a href="https://cidades.ibge.gov.br/brasil/al/arapiraca/panorama" target="_blank" rel="noopener">cidades.ibge.gov.br</a>',
     'Secretaria Municipal de Saúde de Arapiraca — Boletim Epidemiológico Vigi-Óbito (ref. 2024). <a href="https://web.arapiraca.al.gov.br/" target="_blank" rel="noopener">web.arapiraca.al.gov.br</a>',
+    'Ideb 2025 de Arapiraca (anos iniciais 6,32; anos finais 5,52 na notícia): Tribuna do Sertão, 06/08/2026, com comunicado da Prefeitura. Usado só para conferência; a planilha do INEP prevalece.',
     'Referências de Alagoas e Brasil em IDEB: média simples das notas da rede municipal, calculada a partir das planilhas do INEP.'
   ]
 };

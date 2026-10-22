@@ -68,7 +68,7 @@
     var grafico = comValor(k).length === 0
       ? '<div class="chart chart--vazio">Sem série verificada</div>'
       : '<div class="chart"><canvas id="chart-' + esc(k.id) + '" role="img" aria-label="' + esc(k.titulo) + '"></canvas></div>';
-    return '<article class="card" data-eixo="' + esc(k.eixo) + '" data-busca="' + esc((k.titulo + ' ' + k.descricao + ' ' + e.nome).toLowerCase()) + '">' +
+    return '<article class="card" style="--c:' + esc(e.cor) + '" data-eixo="' + esc(k.eixo) + '" data-busca="' + esc((k.titulo + ' ' + k.descricao + ' ' + e.nome).toLowerCase()) + '">' +
       '<div class="card__head">' +
         '<div><h2 class="card__titulo">' + esc(k.titulo) + '</h2><p class="card__eixo">' + esc(e.nome) + '</p></div>' +
         '<div class="card__valor">' + numero(k, u && u.valor) + (u ? '<div class="card__ano">' + u.ano + '</div>' : '') + '</div>' +
@@ -96,21 +96,36 @@
   }
 
   /* ---------- Gráficos ---------- */
+  var GRADE = '#EEF1F6';
+  var TEXTO = '#4B5263';
+
+  // Padrão visual único para todos os gráficos (inclui os de analises.js, carregado depois)
+  function configurarChart() {
+    Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = TEXTO;
+    Chart.defaults.borderColor = GRADE;
+    Chart.defaults.plugins.tooltip = Object.assign(Chart.defaults.plugins.tooltip || {}, {
+      backgroundColor: '#1E1D2B', titleColor: '#FFFFFF', bodyColor: '#E9EAF2',
+      titleFont: { size: 12, weight: '600' }, bodyFont: { size: 12 },
+      padding: 10, cornerRadius: 8, boxPadding: 4, displayColors: true, usePointStyle: true
+    });
+  }
+
   function barOpcoes(k) {
     return {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (c) { return ' ' + fmt(c.parsed.y, k.dec) + ' ' + (k.prefixo ? '' : k.unidadeCurta); } } } },
       scales: {
-        x: { grid: { display: false } },
-        y: { beginAtZero: true, grid: { color: '#EEF1F6' }, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
+        x: { grid: { display: false }, border: { display: false } },
+        y: { beginAtZero: true, grid: { color: GRADE }, border: { display: false }, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
       }
     };
   }
 
   function desenharGraficos() {
     if (typeof Chart === 'undefined') return;
-    Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
-    Chart.defaults.color = '#5B6170';
+    configurarChart();
 
     P.kpis.forEach(function (k) {
       var canvas = document.getElementById('chart-' + k.id);
@@ -148,8 +163,8 @@
             tooltip: { callbacks: { label: function (c) { return ' ' + c.dataset.label + ': ' + fmt(c.parsed.y, k.dec) + ' ' + (k.prefixo ? '' : k.unidadeCurta); } } }
           },
           scales: {
-            x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 8 } },
-            y: { grid: { color: '#EEF1F6' }, beginAtZero: !!k.inicioZero, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
+            x: { grid: { display: false }, border: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 8 } },
+            y: { grid: { color: GRADE }, border: { display: false }, beginAtZero: !!k.inicioZero, ticks: { callback: function (v) { return fmt(v, k.dec > 0 ? 1 : 0); } } }
           }
         }
       });
